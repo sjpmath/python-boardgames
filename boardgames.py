@@ -224,39 +224,6 @@ class TicTacToe(BoardGame):
     if super().diag2done(3, 0, 2, symbol):
       return True
     return False
-  """
-  def hasWon(self, player, symbol):
-    def func(ch1, ch2):
-      if ch1==None:
-        return None
-      elif ch1 == ch2:
-        return ch1
-    for r in range(3):
-      row = []
-      for c in range(3):
-        row.append(self.board[r][c])
-      win = functools.reduce(func, row, symbol)
-      if win:
-        return True
-    for c in range(3):
-      col = []
-      for r in range(3):
-        col.append(self.board[r][c])
-      win = functools.reduce(func, col, symbol)
-      if win:
-        return True
-    diag1 = []
-    for d in range(3):
-      diag1.append(self.board[d][d])
-    if functools.reduce(func, diag1, symbol):
-      return True
-    diag2 = []
-    for d in range(3):
-      diag2.append(self.board[d][2-d])
-    if functools.reduce(func, diag2, symbol):
-      return True
-    return False
-  """
 
   def playgame(self):
     symbol = ['O', 'X']
