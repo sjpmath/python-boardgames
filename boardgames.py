@@ -78,6 +78,124 @@ class BoardGame:
       return True
 
 
+class Sudoku(BoardGame):
+
+
+  @staticmethod
+  def valid(board, r, c, n):
+    row = {}
+    col = {}
+    sq = {}
+    for c1 in range(9):
+      if board[r][c1]!='.': 
+        row.update({board[r][c1]: True})
+    for r1 in range(9):
+      if board[r1][c]!='.': 
+        col.update({board[r1][c]: True})
+    startr = r//3
+    startc = c//3
+    for r1 in range(startr, startr+3):
+      for c1 in range(startc, startc+3):
+        if board[r1][c1]!='.':
+          sq.update({board[r1][c1]: True})
+    if (n in row) or (n in col) or (n in sq):
+      return False
+    return True
+
+  @staticmethod
+  def generateSudoku():
+    validSudoku = [
+      ['6', '2', '5', '8', '4', '3', '7', '9', '1'],
+      ['7', '9', '1', '2', '6', '5', '4', '8', '3'],
+      ['4', '8', '3', '9', '7', '1', '6', '2', '5'],
+      ['8', '1', '4', '5', '9', '7', '2', '3', '6'],
+      ['2', '3', '6', '1', '8', '4', '9', '5', '7'],
+      ['9', '5', '7', '3', '2', '6', '8', '1', '4'],
+      ['5', '6', '9', '4', '3', '2', '1', '7', '8'],
+      ['3', '4', '2', '7', '1', '8', '5', '6', '9'],
+      ['1', '7', '8', '6', '5', '9', '3', '4', '2']
+    ]
+    # idea: shuffle row and col labels, from existing valid sudoku level
+    #only shuffle each group of three to maintain invariant of square rule
+
+    #idea: permutation of rows and permutation of cols uniquely determine grid
+    def shuffle(ar): return random.sample(ar, len(ar)) # generate random permutation of ar
+    rows = []
+    rowperm = shuffle(range(3))
+    for r in rowperm:
+      perm = shuffle(range(3))
+      for p in perm:
+        rows.append(r*3+p)
+    cols = []
+    colperm = shuffle(range(3))
+    for c in colperm:
+      perm = shuffle(range(3))
+      for p in perm:
+        cols.append(c*3+p)
+    board = [['.' for _ in range(9)] for _ in range(9)]
+    for i in range(9):
+      for j in range(9):
+        board[rows[i]][cols[j]] = validSudoku[i][j]
+
+    return board
+
+
+  def get_user_input(self):
+    while True:
+      try:
+        r,c = super().get_user_input()
+        if self.board[r][c]!='.':
+          raise ValueError
+        n = input("Enter number to input: ")
+        if not n.isnumeric() or int(n) < 1 or int(n) > 9:
+          raise AssertionError
+      except ValueError:
+        print("cell already filled")
+      except AssertionError:
+        print("please enter integer between 1 and 9")
+      else:
+        return (r,c,n)
+
+
+
+  def __init__(self):
+    super().__init__(9,9)
+    self.board = Sudoku.generateSudoku()
+    xs = random.sample(range(81), 40)
+    for x in xs:
+      r = int(x/9); c = x%9
+      self.board[r][c] = '.'
+
+  def playgame(self):
+    rows = [{} for _ in range(9)]
+    cols = [{} for _ in range(9)]
+    sqs = [[{} for _ in range(3)] for _ in range(3)]
+    for r in range(9):
+      for c in range(9):
+        ro = r//3; co = c//3
+        if self.board[r][c]!='.':
+          n = self.board[r][c]
+          rows[r].update({n:True})
+          cols[c].update({n:True})
+          sqs[ro][co].update({n:True})
+
+    i = 0
+    while i < 41:
+      self.print_board()
+      r,c,n = self.get_user_input()
+      ro = r//3; co = c//3
+      if n in rows[r] or n in cols[c] or n in sqs[ro][co]:
+        print("violation")
+      else:
+        self.board[r][c] = n
+        rows[r].update({n:True})
+        cols[c].update({n:True})
+        sqs[ro][co].update({n:True})
+        i+=1
+    print("finished!")
+
+
+
 class MineSweeper(BoardGame):
   def __init__(self):
     super().__init__(9,9)
@@ -355,12 +473,6 @@ class TicTacToe:
         
       
 
-#obj = TicTacToe()
-#obj.playgame()
-
-#obj1 = Omok()
-#obj1.playgame()
-
-obj2 = MineSweeper()
-obj2.playgame()
+obj = Sudoku()
+obj.playgame()
         
